@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -29,6 +30,7 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText emailEditText;
     private EditText passwordEditText;
     private Button signupButton;
+    private TextView errorTextView;
 
 
 
@@ -39,6 +41,8 @@ public class SignUpActivity extends AppCompatActivity {
         emailEditText = findViewById(R.id.emailEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         signupButton = findViewById(R.id.signupButton);
+        errorTextView = findViewById(R.id.errorTextView);
+
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -53,35 +57,47 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void registerUser(String email, String password) {
-        Log.d("EmailPasswordValidation", email + " " + password);
+
+        //Log.d("EmailPasswordValidation", email + " " + password);
         //Validate email and password, show error by toast message
-        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)){
-            Toast.makeText(SignUpActivity.this, "Empty Fields", Toast.LENGTH_SHORT).show();
-        }
-        else if (!InputValidation.isValidEmail(email)) {
-            Toast.makeText(SignUpActivity.this, "Invalid email format", Toast.LENGTH_SHORT).show();
-        } else if (!InputValidation.isValidPassword(password)) {
-            Log.d("EmailPasswordValidation", "password hit");
-            Toast.makeText(SignUpActivity.this, "Password should be at least 4 characters, a uppercase, a lowercase, a digit, and a special character", Toast.LENGTH_LONG).show();
-        } else {
+        boolean isEmailValid = InputValidation.isValidEmail(email);
+        boolean isPasswordValid = InputValidation.isValidPassword(password);
+        if (isEmailValid && isPasswordValid) {
+            errorTextView.setVisibility(View.GONE);
             mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(SignUpActivity.this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
+                    // Sign up is successful, update UI with the signed-in user's information
                     if (task.isSuccessful()) {
-                        // Sign up is successful, update UI with the signed-in user's information
                         Toast.makeText(SignUpActivity.this, "Successful Signed Up", Toast.LENGTH_SHORT).show();
                         FirebaseUser user = mAuth.getCurrentUser();
                         Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
                         startActivity(intent);
                         finish();
-                    } else {
+                    }
+                    else {
                         // If signs up fails, display a message to the user, use task.getException() to get details about the failure
                         Toast.makeText(SignUpActivity.this, "Failed to sign up user, please try again", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
+        } else {
+            errorTextView.setVisibility(View.VISIBLE);
+            if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)){
+                errorTextView.setText("Empty field(s)");
+                //Toast.makeText(SignUpActivity.this, "Empty Fields", Toast.LENGTH_SHORT).show();
+            }
+            else if (!isEmailValid && !isPasswordValid) {
+                errorTextView.setText("Invalid Email and Password format. Password requirements not met. Password should be at least 4 characters, a uppercase, a lowercase, a digit, and a special character.");
+            }
+            else if (!isEmailValid) {
+                errorTextView.setText("Invalid Email format. Please Try Again.");
+                //Toast.makeText(SignUpActivity.this, "Invalid email format", Toast.LENGTH_SHORT).show();
+            } else if(!isPasswordValid){
+                errorTextView.setText("Password requirements not met. Password should be at least 4 characters, a uppercase, a lowercase, a digit, and a special character.");
+                //Toast.makeText(SignUpActivity.this, "Invalid password format", Toast.LENGTH_SHORT).show();
+            }
         }
-
     }
 
 }

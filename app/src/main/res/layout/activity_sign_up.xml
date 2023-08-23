@@ -34,4 +34,15 @@
         android:layout_height="wrap_content"
         android:text="Sign Up"/>
 
+    <TextView
+        android:padding="16dp"
+        android:id="@+id/errorTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FF6969"
+        android:textStyle="bold"
+        android:text="User Authentication Error Message Here"
+        android:visibility="gone"/>
+
+
 </LinearLayout>
