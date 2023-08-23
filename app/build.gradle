@@ -73,4 +73,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:22.1.1' // Add Firebase SDK in app level
     implementation platform('com.google.firebase:firebase-bom:32.2.2') // Using Firebase Android BoM, the app will always use compatible versions of Firebase android libraries
     implementation 'com.google.firebase:firebase-analytics'
+
+    testImplementation 'junit:junit:4.+'
+    testImplementation 'org.mockito:mockito-core:3.+'
 }
